@@ -34,17 +34,7 @@ import static rbasamoyai.createbigcannons.CreateBigCannons.REGISTRATE;
 
 public class CBCEntityTypes {
 
-	public static final EntityEntry<PitchOrientedContraptionEntity> PITCH_ORIENTED_CONTRAPTION = REGISTRATE
-			.entity("pitch_contraption", PitchOrientedContraptionEntity::new, MobCategory.MISC)
-			.properties(b -> b
-					.trackRangeBlocks(16)
-					.trackedUpdateRate(3)
-					.forceTrackedVelocityUpdates(true)
-					.fireImmune()
-			)
-			.properties(AbstractContraptionEntity::build)
-			.renderer(() -> OrientedContraptionEntityRenderer::new)
-			.register();
+	public static final EntityEntry<PitchOrientedContraptionEntity> PITCH_ORIENTED_CONTRAPTION = REGISTRATE.entity("pitch_contraption", PitchOrientedContraptionEntity::new, MobCategory.MISC).properties(b -> b.trackRangeBlocks(16).trackedUpdateRate(3).forceTrackedVelocityUpdates(true).fireImmune()).properties(AbstractContraptionEntity::build).renderer(() -> OrientedContraptionEntityRenderer::new).register();
 
 	public static final EntityEntry<SolidShotProjectile> SHOT = cannonProjectile("shot", SolidShotProjectile::new);
 	public static final EntityEntry<HEShellProjectile> HE_SHELL = cannonProjectile("he_shell", HEShellProjectile::new, "High Explosive (HE) Shell");
@@ -55,65 +45,31 @@ public class CBCEntityTypes {
 	public static final EntityEntry<FluidShellProjectile> FLUID_SHELL = cannonProjectile("fluid_shell", FluidShellProjectile::new);
 	public static final EntityEntry<MortarStoneProjectile> MORTAR_STONE = cannonProjectile("mortar_stone", MortarStoneProjectile::new);
 
-	public static final EntityEntry<Shrapnel> SHRAPNEL = REGISTRATE
-			.entity("shrapnel", Shrapnel::new, MobCategory.MISC)
-			.properties(Shrapnel::build)
-			.renderer(() -> ShrapnelRenderer::new)
-			.register();
+	public static final EntityEntry<Shrapnel> SHRAPNEL = REGISTRATE.entity("shrapnel", Shrapnel::new, MobCategory.MISC).properties(Shrapnel::build).renderer(() -> ShrapnelRenderer::new).register();
 
-	public static final EntityEntry<Grapeshot> GRAPESHOT = REGISTRATE
-			.entity("grapeshot", Grapeshot::new, MobCategory.MISC)
-			.properties(Grapeshot::build)
-			.renderer(() -> GrapeshotRenderer::new)
-			.register();
+	public static final EntityEntry<Grapeshot> GRAPESHOT = REGISTRATE.entity("grapeshot", Grapeshot::new, MobCategory.MISC).properties(Grapeshot::build).renderer(() -> GrapeshotRenderer::new).register();
 
-	public static final EntityEntry<FluidBlob> FLUID_BLOB = REGISTRATE
-			.entity("fluid_blob", FluidBlob::new, MobCategory.MISC)
-			.properties(Shrapnel::build)
-			.renderer(() -> NoopRenderer::new)
-			.register();
+	public static final EntityEntry<FluidBlob> FLUID_BLOB = REGISTRATE.entity("fluid_blob", FluidBlob::new, MobCategory.MISC).properties(Shrapnel::build).renderer(() -> NoopRenderer::new).register();
 
-	public static final EntityEntry<CannonCarriageEntity> CANNON_CARRIAGE = REGISTRATE
-			.entity("cannon_carriage", CannonCarriageEntity::new, MobCategory.MISC)
-			.properties(CannonCarriageEntity::build)
-			.renderer(() -> CannonCarriageRenderer::new)
-			.register();
+	public static final EntityEntry<CannonCarriageEntity> CANNON_CARRIAGE = REGISTRATE.entity("cannon_carriage", CannonCarriageEntity::new, MobCategory.MISC).properties(CannonCarriageEntity::build).renderer(() -> CannonCarriageRenderer::new).register();
 	public static final EntityEntry<APAutocannonProjectile> AP_AUTOCANNON = autocannonProjectile("ap_autocannon", APAutocannonProjectile::new, "Armor Piercing (AP) Autocannon Round");
 	public static final EntityEntry<FlakAutocannonProjectile> FLAK_AUTOCANNON = autocannonProjectile("flak_autocannon", FlakAutocannonProjectile::new, "Flak Autocannon Round");
 
 
 	private static <T extends AbstractBigCannonProjectile> EntityEntry<T> cannonProjectile(String id, EntityFactory<T> factory) {
-		return REGISTRATE
-				.entity(id, factory, MobCategory.MISC)
-				.properties(AbstractCannonProjectile::build)
-				.renderer(() -> BigCannonProjectileRenderer::new)
-				.register();
+		return REGISTRATE.entity(id, factory, MobCategory.MISC).properties(AbstractCannonProjectile::build).renderer(() -> BigCannonProjectileRenderer::new).register();
 	}
 
 	private static <T extends AbstractBigCannonProjectile> EntityEntry<T> cannonProjectile(String id, EntityFactory<T> factory, String enUSdiffLang) {
-		return REGISTRATE
-				.entity(id, factory, MobCategory.MISC)
-				.properties(AbstractCannonProjectile::build)
-				.renderer(() -> BigCannonProjectileRenderer::new)
-				.lang(enUSdiffLang)
-				.register();
+		return REGISTRATE.entity(id, factory, MobCategory.MISC).properties(AbstractCannonProjectile::build).renderer(() -> BigCannonProjectileRenderer::new).lang(enUSdiffLang).register();
 	}
 
 	private static <T extends AbstractAutocannonProjectile> EntityEntry<T> autocannonProjectile(String id, EntityFactory<T> factory) {
-		return REGISTRATE
-				.entity(id, factory, MobCategory.MISC)
-				.properties(AbstractAutocannonProjectile::buildAutocannon)
-				.renderer(() -> AutocannonProjectileRenderer::new)
-				.register();
+		return REGISTRATE.entity(id, factory, MobCategory.MISC).properties(AbstractAutocannonProjectile::buildAutocannon).renderer(() -> AutocannonProjectileRenderer::new).register();
 	}
 
 	private static <T extends AbstractAutocannonProjectile> EntityEntry<T> autocannonProjectile(String id, EntityFactory<T> factory, String enUSdiffLang) {
-		return REGISTRATE
-				.entity(id, factory, MobCategory.MISC)
-				.properties(AbstractAutocannonProjectile::buildAutocannon)
-				.renderer(() -> AutocannonProjectileRenderer::new)
-				.lang(enUSdiffLang)
-				.register();
+		return REGISTRATE.entity(id, factory, MobCategory.MISC).properties(AbstractAutocannonProjectile::buildAutocannon).renderer(() -> AutocannonProjectileRenderer::new).lang(enUSdiffLang).register();
 	}
 
 	public static void register() {
