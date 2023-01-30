@@ -1,19 +1,15 @@
 package rbasamoyai.createbigcannons.base;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import com.simibubi.create.content.AllSections;
 import com.simibubi.create.content.contraptions.goggles.GogglesItem;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.Lang;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
@@ -24,24 +20,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 import rbasamoyai.createbigcannons.CBCTags;
 import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.CreateBigCannonsClient;
+import rbasamoyai.createbigcannons.cannons.autocannon.AutocannonBlock;
+import rbasamoyai.createbigcannons.cannons.autocannon.AutocannonMaterial;
 import rbasamoyai.createbigcannons.cannons.big_cannons.BigCannonBlock;
 import rbasamoyai.createbigcannons.cannons.big_cannons.BigCannonMaterial;
 import rbasamoyai.createbigcannons.cannons.big_cannons.BigCannonMaterial.FailureMode;
-import rbasamoyai.createbigcannons.cannons.autocannon.AutocannonBlock;
-import rbasamoyai.createbigcannons.cannons.autocannon.AutocannonMaterial;
 import rbasamoyai.createbigcannons.config.CBCConfigs;
 import rbasamoyai.createbigcannons.manualloading.RamRodItem;
 import rbasamoyai.createbigcannons.manualloading.WormItem;
+
+import java.util.List;
 
 public class CBCTooltip {
 
 	public static <T extends Block & BigCannonBlock> void appendCannonBlockText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag, T block) {
 		boolean desc = Screen.hasShiftDown();
-		
+
 		String[] holdDesc = Lang.translateDirect("tooltip.holdForDescription", "$").getString().split("\\$");
 		if (holdDesc.length >= 2) {
 			Component keyShift = Lang.translateDirect("tooltip.keyShift");
@@ -51,7 +49,7 @@ public class CBCTooltip {
 			tabBuilder.append(new TextComponent(holdDesc[1]).withStyle(ChatFormatting.DARK_GRAY));
 			tooltip.add(tabBuilder);
 		}
-		
+
 		ItemDescription.Palette palette = getPalette(level, stack);
 		if (desc) {
 			BigCannonMaterial material = block.getCannonMaterial();
@@ -59,7 +57,7 @@ public class CBCTooltip {
 			boolean hasGoggles = GogglesItem.isWearingGoggles(mc.player);
 			String rootKey = "block." + CreateBigCannons.MOD_ID + ".cannon.tooltip";
 			tooltip.add(new TextComponent(I18n.get(rootKey + ".materialProperties")).withStyle(ChatFormatting.GRAY));
-			
+
 			tooltip.add(new TextComponent(" " + I18n.get(rootKey + ".strength")).withStyle(ChatFormatting.GRAY));
 			int strength = material.maxSafeCharges();
 			if (hasGoggles) {
@@ -67,7 +65,7 @@ public class CBCTooltip {
 			} else {
 				tooltip.add(getNoGogglesMeter(strength == 0 ? 0 : strength / 2 + 1, false, true));
 			}
-			
+
 			tooltip.add(new TextComponent(" " + I18n.get(rootKey + ".squibRatio")).withStyle(ChatFormatting.GRAY));
 			if (hasGoggles) {
 				tooltip.addAll(TooltipHelper.cutStringTextComponent(I18n.get(rootKey + ".squibRatio.goggles", material.squibRatioNum(), material.squibRatioDem()), palette.color, palette.hColor, 2));
@@ -75,27 +73,27 @@ public class CBCTooltip {
 				double squibRatio = material.squibRatio();
 				tooltip.add(getNoGogglesMeter(squibRatio < 1d ? 0 : Mth.ceil(material.squibRatio() * 5d / 3d), false, true));
 			}
-			
+
 			tooltip.add(new TextComponent(" " + I18n.get(rootKey + ".weightImpact")).withStyle(ChatFormatting.GRAY));
 			float weightImpact = material.weight();
 			if (hasGoggles) {
 				tooltip.addAll(TooltipHelper.cutStringTextComponent(I18n.get(rootKey + ".weightImpact.goggles", String.format("%.2f", weightImpact)), palette.color, palette.hColor, 2));
 			} else {
-				tooltip.add(getNoGogglesMeter(weightImpact < 1d ? 0 : (int)(weightImpact * 0.5f), true, true));
+				tooltip.add(getNoGogglesMeter(weightImpact < 1d ? 0 : (int) (weightImpact * 0.5f), true, true));
 			}
-			
+
 			tooltip.add(new TextComponent(" " + I18n.get(rootKey + ".onFailure")).withStyle(ChatFormatting.GRAY));
 			String failKey = material.failureMode() == FailureMode.RUPTURE ? ".onFailure.rupture" : ".onFailure.fragment";
 			tooltip.addAll(TooltipHelper.cutStringTextComponent(I18n.get(rootKey + failKey), palette.color, palette.hColor, 1));
-			
-			if (ForgeRegistries.BLOCKS.tags().getTag(CBCTags.BlockCBC.WEAK_CANNON_END).contains(block) && CBCConfigs.SERVER.cannons.weakBreechStrength.get() != -1) {
+
+			if (Registry.BLOCK.getOrCreateTag(CBCTags.BlockCBC.WEAK_CANNON_END).contains(block.builtInRegistryHolder()) && CBCConfigs.SERVER.cannons.weakBreechStrength.get() != -1) {
 				int weakCharges = CBCConfigs.SERVER.cannons.weakBreechStrength.get();
 				tooltip.add(new TextComponent(" " + I18n.get(rootKey + ".weakCannonEnd")).withStyle(ChatFormatting.GRAY));
 				tooltip.addAll(TooltipHelper.cutStringTextComponent(I18n.get(rootKey + ".weakCannonEnd.desc", weakCharges), palette.color, palette.hColor, 2));
 			}
 		}
 	}
-	
+
 	private static Component getNoGogglesMeter(int outOfFive, boolean invertColor, boolean canBeInvalid) {
 		int value = invertColor ? 5 - outOfFive : outOfFive;
 		ChatFormatting color = switch (value) {
@@ -201,7 +199,7 @@ public class CBCTooltip {
 		if (Screen.hasShiftDown()) {
 			String key = stack.getDescriptionId() + ".tooltip.chance";
 			tooltip.add(new TextComponent(I18n.get(key)).withStyle(ChatFormatting.GRAY));
-			tooltip.addAll(TooltipHelper.cutStringTextComponent(I18n.get(key + ".value", (int)(detChance * 100.0f)), palette.color, palette.hColor, 1));
+			tooltip.addAll(TooltipHelper.cutStringTextComponent(I18n.get(key + ".value", (int) (detChance * 100.0f)), palette.color, palette.hColor, 1));
 		}
 	}
 
