@@ -3,6 +3,7 @@ package rbasamoyai.createbigcannons.cannon_control.contraption;
 import com.simibubi.create.content.contraptions.components.structureMovement.AssemblyException;
 import com.simibubi.create.content.contraptions.components.structureMovement.ContraptionType;
 import com.simibubi.create.content.contraptions.components.structureMovement.StructureTransform;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.items.IItemHandler;
 import rbasamoyai.createbigcannons.CBCBlocks;
 import rbasamoyai.createbigcannons.CBCContraptionTypes;
 import rbasamoyai.createbigcannons.CreateBigCannons;
@@ -72,7 +72,7 @@ public class MountedAutocannonContraption extends AbstractMountedCannonContrapti
 	}
 
 	@Override
-	public LazyOptional<IItemHandler> getItemOptional() {
+	public LazyOptional<ItemStackHandler> getItemOptional() {
 		return this.presentTileEntities.get(this.startPos) instanceof AutocannonBreechBlockEntity breech ? LazyOptional.of(breech::createItemHandler) : LazyOptional.empty();
 	}
 

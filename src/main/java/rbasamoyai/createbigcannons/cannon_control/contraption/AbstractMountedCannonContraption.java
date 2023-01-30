@@ -4,6 +4,10 @@ import com.simibubi.create.content.contraptions.components.structureMovement.Ass
 import com.simibubi.create.content.contraptions.components.structureMovement.Contraption;
 import com.simibubi.create.content.contraptions.components.structureMovement.NonStationaryLighter;
 import com.simibubi.create.content.contraptions.components.structureMovement.render.ContraptionLighter;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,36 +18,60 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
 import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.cannon_control.ControlPitchContraption;
 import rbasamoyai.createbigcannons.config.CBCConfigs;
 
 import java.util.Map;
 
-public abstract class AbstractMountedCannonContraption extends Contraption  {
+public abstract class AbstractMountedCannonContraption extends Contraption {
 
 	protected Direction initialOrientation = Direction.NORTH;
 	protected BlockPos startPos = BlockPos.ZERO;
 
+	public static int getMaxCannonLength() {
+		return CBCConfigs.SERVER.cannons.maxCannonLength.get();
+	}
+
+	public static AssemblyException cannonTooLarge() {
+		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.cannonTooLarge", getMaxCannonLength()));
+	}
+
+	public static AssemblyException invalidCannon() {
+		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.invalidCannon"));
+	}
+
+	public static AssemblyException cannonLoaderInsideDuringAssembly(BlockPos pos) {
+		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.cannonLoaderInsideDuringAssembly", pos.getX(), pos.getY(), pos.getZ()));
+	}
+
+	public static AssemblyException hasIncompleteCannonBlocks(BlockPos pos) {
+		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.hasIncompleteCannonBlocks", pos.getX(), pos.getY(), pos.getZ()));
+	}
+
 	public abstract float maximumDepression(ControlPitchContraption controller);
+
 	public abstract float maximumElevation(ControlPitchContraption controller);
 
-	public LazyOptional<IItemHandler> getItemOptional() { return LazyOptional.empty(); }
+	public LazyOptional<ItemStackHandler> getItemOptional() {
+		return LazyOptional.empty();
+	}
 
-	public Direction initialOrientation() { return this.initialOrientation; }
+	public Direction initialOrientation() {
+		return this.initialOrientation;
+	}
 
 	public abstract void onRedstoneUpdate(ServerLevel level, PitchOrientedContraptionEntity entity, boolean togglePower, int firePower);
+
 	public abstract void fireShot(ServerLevel level, PitchOrientedContraptionEntity entity);
 
 	public abstract float getWeightForStress();
 
-	public void tick(Level level, PitchOrientedContraptionEntity entity) {}
+	public void tick(Level level, PitchOrientedContraptionEntity entity) {
+	}
 
-	public void animate() {}
+	public void animate() {
+	}
 
 	@Override
 	public CompoundTag writeNBT(boolean spawnPacket) {
@@ -87,35 +115,31 @@ public abstract class AbstractMountedCannonContraption extends Contraption  {
 		}
 	}
 
-	@Override public boolean canBeStabilized(Direction direction, BlockPos pos) { return true; }
-
-	public boolean canBeTurnedByPassenger(Entity entity) { return false; }
-	public boolean canBeTurnedByController(ControlPitchContraption control) { return true; }
-	public boolean canBeFiredOnController(ControlPitchContraption control) { return true; }
-
-	public BlockPos getSeatPos(Entity entity) { return null; }
-
-	@Environment(EnvType.Client)
-	@Override public ContraptionLighter<?> makeLighter() { return new NonStationaryLighter<>(this); }
-
-	public static int getMaxCannonLength() {
-		return CBCConfigs.SERVER.cannons.maxCannonLength.get();
+	@Override
+	public boolean canBeStabilized(Direction direction, BlockPos pos) {
+		return true;
 	}
 
-	public static AssemblyException cannonTooLarge() {
-		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.cannonTooLarge", getMaxCannonLength()));
+	public boolean canBeTurnedByPassenger(Entity entity) {
+		return false;
 	}
 
-	public static AssemblyException invalidCannon() {
-		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.invalidCannon"));
+	public boolean canBeTurnedByController(ControlPitchContraption control) {
+		return true;
 	}
 
-	public static AssemblyException cannonLoaderInsideDuringAssembly(BlockPos pos) {
-		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.cannonLoaderInsideDuringAssembly", pos.getX(), pos.getY(), pos.getZ()));
+	public boolean canBeFiredOnController(ControlPitchContraption control) {
+		return true;
 	}
 
-	public static AssemblyException hasIncompleteCannonBlocks(BlockPos pos) {
-		return new AssemblyException(new TranslatableComponent("exception." + CreateBigCannons.MOD_ID + ".cannon_mount.hasIncompleteCannonBlocks", pos.getX(), pos.getY(), pos.getZ()));
+	public BlockPos getSeatPos(Entity entity) {
+		return null;
+	}
+
+	@Environment(EnvType.CLIENT)
+	@Override
+	public ContraptionLighter<?> makeLighter() {
+		return new NonStationaryLighter<>(this);
 	}
 
 }
