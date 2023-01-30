@@ -1,5 +1,6 @@
 package rbasamoyai.createbigcannons.munitions.big_cannon.shrapnel;
 
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -33,8 +34,8 @@ public class Shrapnel extends AbstractHurtingProjectile {
 		super(type, level);
 	}
 
-	public static void build(EntityType.Builder<? extends Shrapnel> builder) {
-		builder.clientTrackingRange(3).updateInterval(20).fireImmune().sized(0.25f, 0.25f);
+	public static void build(FabricEntityTypeBuilder<? extends Shrapnel> builder) {
+		builder.trackRangeBlocks(3).trackedUpdateRate(20).fireImmune().dimensions(EntityDimensions.scalable(0.25f, 0.25f));
 	}
 
 	public static <T extends Shrapnel> List<T> spawnShrapnelBurst(Level level, EntityType<T> type, Vec3 position, Vec3 initialVelocity, int count, double spread, float damage) {
@@ -153,5 +154,4 @@ public class Shrapnel extends AbstractHurtingProjectile {
 	protected double getGravity() {
 		return 0;
 	}
-
 }
