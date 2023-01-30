@@ -58,7 +58,7 @@ public class MunitionFuzingRecipe extends CustomRecipe {
 
 		if (round.isEmpty() || fuze.isEmpty()) return ItemStack.EMPTY;
 		ItemStack result = round.copy();
-		result.getOrCreateTag().put("Fuze", fuze.serializeNBT());
+		result.getOrCreateTag().put("Fuze", fuze.getOrCreateTag());
 		return result;
 	}
 
