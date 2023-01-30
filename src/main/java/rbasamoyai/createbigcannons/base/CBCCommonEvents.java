@@ -2,7 +2,8 @@ package rbasamoyai.createbigcannons.base;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.contraptions.components.structureMovement.piston.MechanicalPistonBlock.PistonState;
-
+import io.github.fabricators_of_create.porting_lib.event.common.BlockEvents;
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -10,8 +11,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import rbasamoyai.createbigcannons.CBCBlocks;
 import rbasamoyai.createbigcannons.crafting.boring.CannonDrillBlock;
 import rbasamoyai.createbigcannons.crafting.boring.CannonDrillBlockEntity;
@@ -19,9 +18,9 @@ import rbasamoyai.createbigcannons.crafting.builtup.CannonBuilderBlock;
 import rbasamoyai.createbigcannons.crafting.builtup.CannonBuilderBlock.BuilderState;
 import rbasamoyai.createbigcannons.crafting.builtup.CannonBuilderBlockEntity;
 
-public class CBCCommonEvents {
+public class CBCCommonEvents implements ModInitializer {
 
-	public static void onPlayerBreakBlock(BreakEvent event) {
+	public static void onPlayerBreakBlock(BlockEvents.BreakEvent event) {
 		BlockState state = event.getState();
 		LevelAccessor level = event.getWorld();
 		BlockPos pos = event.getPos();
@@ -40,25 +39,25 @@ public class CBCCommonEvents {
 				if (level.getBlockEntity(pos) instanceof CannonBuilderBlockEntity builder) {
 					builder.onLengthBroken();
 				}
-				return;			
+				return;
 			}
 		}
 	}
-	
-	private static BlockPos destroyPoleContraption(Block head, Block base, int limit, BreakEvent event) {
+
+	private static BlockPos destroyPoleContraption(Block head, Block base, int limit, BlockEvents.BreakEvent event) {
 		LevelAccessor level = event.getWorld();
 		BlockPos pos = event.getPos();
 		Direction.Axis axis = event.getState().getValue(BlockStateProperties.FACING).getAxis();
 		Direction positive = Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
-		
+
 		BlockPos headPos = null;
 		BlockPos basePos = null;
-		
-		for (int mod : new int[] { 1, -1 }) {
+
+		for (int mod : new int[]{1, -1}) {
 			for (int offs = mod; mod * offs < limit; offs += mod) {
 				BlockPos pos1 = pos.relative(positive, offs);
 				BlockState state1 = level.getBlockState(pos1);
-				
+
 				if (AllBlocks.PISTON_EXTENSION_POLE.has(state1) && axis == state1.getValue(BlockStateProperties.FACING).getAxis()) {
 					continue;
 				}
@@ -74,14 +73,13 @@ public class CBCCommonEvents {
 		if (headPos == null || basePos == null) return null;
 		Player player = event.getPlayer();
 		BlockPos baseCopy = basePos.immutable();
-		BlockPos.betweenClosedStream(headPos, basePos)
-		.filter(p -> !p.equals(pos) && !p.equals(baseCopy))
-		.forEach(p -> level.destroyBlock(p, !player.isCreative()));
+		BlockPos.betweenClosedStream(headPos, basePos).filter(p -> !p.equals(pos) && !p.equals(baseCopy)).forEach(p -> level.destroyBlock(p, !player.isCreative()));
 		return baseCopy;
 	}
-	
-	public static void register(IEventBus forgeEventBus) {
-		forgeEventBus.addListener(CBCCommonEvents::onPlayerBreakBlock);
+
+	@Override
+	public void onInitialize() {
+		BlockEvents.BLOCK_BREAK.register(CBCCommonEvents::onPlayerBreakBlock);
 	}
-	
+
 }

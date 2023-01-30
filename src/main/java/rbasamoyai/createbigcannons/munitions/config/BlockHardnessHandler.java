@@ -3,6 +3,7 @@ package rbasamoyai.createbigcannons.munitions.config;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -20,11 +21,16 @@ public class BlockHardnessHandler {
 	public static final Map<Block, Double> TAG_MAP = new HashMap<>();
 	public static final Map<Block, Double> BLOCK_MAP = new HashMap<>();
 
-	public static class ReloadListener extends SimpleJsonResourceReloadListener {
-		private static final Gson GSON = new Gson();
-		public static final ReloadListener INSTANCE = new ReloadListener();
+	public static final String resourceLocationString = "block_hardness";
+	public static final ResourceLocation resourceLocation = ResourceLocation.tryParse(resourceLocationString);
 
-		public ReloadListener() { super(GSON, "block_hardness"); }
+	public static class ReloadListener extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
+		public static final ReloadListener INSTANCE = new ReloadListener();
+		private static final Gson GSON = new Gson();
+
+		public ReloadListener() {
+			super(GSON, resourceLocationString);
+		}
 
 		@Override
 		protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiler) {
@@ -58,6 +64,11 @@ public class BlockHardnessHandler {
 
 				}
 			}
+		}
+
+		@Override
+		public ResourceLocation getFabricId() {
+			return resourceLocation;
 		}
 	}
 
