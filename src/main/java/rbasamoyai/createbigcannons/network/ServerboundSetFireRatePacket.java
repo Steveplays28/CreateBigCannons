@@ -1,33 +1,36 @@
 package rbasamoyai.createbigcannons.network;
 
+import me.pepperbell.simplenetworking.C2SPacket;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import rbasamoyai.createbigcannons.cannon_control.carriage.CannonCarriageEntity;
 
-import java.util.function.Supplier;
+public class ServerboundSetFireRatePacket implements C2SPacket {
 
-public class ServerboundSetFireRatePacket {
+	private final int fireRateAdjustment;
 
-    private final int fireRateAdjustment;
+	public ServerboundSetFireRatePacket(int fireRateAdjustment) {
+		this.fireRateAdjustment = fireRateAdjustment;
+	}
 
-    public ServerboundSetFireRatePacket(int fireRateAdjustment) {
-        this.fireRateAdjustment = fireRateAdjustment;
-    }
+	public ServerboundSetFireRatePacket(FriendlyByteBuf buf) {
+		this.fireRateAdjustment = buf.readVarInt();
+	}
 
-    public ServerboundSetFireRatePacket(FriendlyByteBuf buf) {
-        this.fireRateAdjustment = buf.readVarInt();
-    }
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeVarInt(this.fireRateAdjustment);
+	}
 
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.fireRateAdjustment);
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> sup) {
-        NetworkEvent.Context ctx = sup.get();
-        ctx.enqueueWork(() -> {
-            if (this.fireRateAdjustment != 0 && ctx.getSender().getRootVehicle() instanceof CannonCarriageEntity carriage) carriage.trySettingFireRateCarriage(this.fireRateAdjustment);
-        });
-        ctx.setPacketHandled(true);
-    }
-
+	@Override
+	public void handle(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, PacketSender responseSender, SimpleChannel channel) {
+		server.execute(() -> {
+			if (this.fireRateAdjustment != 0 && player.getRootVehicle() instanceof CannonCarriageEntity carriage) {
+				carriage.trySettingFireRateCarriage(this.fireRateAdjustment);
+			}
+		});
+	}
 }

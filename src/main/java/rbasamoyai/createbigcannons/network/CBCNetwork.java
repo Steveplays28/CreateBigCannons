@@ -1,77 +1,30 @@
 package rbasamoyai.createbigcannons.network;
 
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import me.pepperbell.simplenetworking.SimpleChannel;
 import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.crafting.BlockRecipesManager.ClientboundRecipesPacket;
 
 public class CBCNetwork {
 
-	public static final String VERSION = "1.3.0";
-	
 	public static final SimpleChannel INSTANCE = construct();
-	
-	public static SimpleChannel construct() {
-		SimpleChannel channel = NetworkRegistry.ChannelBuilder
-				.named(CreateBigCannons.resource("network"))
-				.clientAcceptedVersions(VERSION::equals)
-				.serverAcceptedVersions(VERSION::equals)
-				.networkProtocolVersion(() -> VERSION)
-				.simpleChannel();
-		
+
+	protected static SimpleChannel construct() {
+		SimpleChannel channel = new SimpleChannel(CreateBigCannons.resource("network"));
 		int id = 0;
-		
-		channel.messageBuilder(ServerboundTimedFuzePacket.class, id++)
-				.encoder(ServerboundTimedFuzePacket::encode)
-				.decoder(ServerboundTimedFuzePacket::new)
-				.consumer(ServerboundTimedFuzePacket::handle)
-				.add();
-		
-		channel.messageBuilder(ClientboundRecipesPacket.class, id++)
-				.encoder(ClientboundRecipesPacket::encode)
-				.decoder(ClientboundRecipesPacket::new)
-				.consumer(ClientboundRecipesPacket::handle)
-				.add();
-		
-		channel.messageBuilder(ClientboundUpdateContraptionPacket.class, id++)
-				.encoder(ClientboundUpdateContraptionPacket::encode)
-				.decoder(ClientboundUpdateContraptionPacket::new)
-				.consumer(ClientboundUpdateContraptionPacket::handle)
-				.add();
-		
-		channel.messageBuilder(ServerboundProximityFuzePacket.class, id++)
-				.encoder(ServerboundProximityFuzePacket::encode)
-				.decoder(ServerboundProximityFuzePacket::new)
-				.consumer(ServerboundProximityFuzePacket::handle)
-				.add();
 
-		channel.messageBuilder(ServerboundFiringActionPacket.class, id++)
-				.encoder(ServerboundFiringActionPacket::encode)
-				.decoder(ServerboundFiringActionPacket::new)
-				.consumer(ServerboundFiringActionPacket::handle)
-				.add();
+		// Register C2S packets
+		channel.registerC2SPacket(ServerboundTimedFuzePacket.class, id++, ServerboundTimedFuzePacket::new);
+		channel.registerC2SPacket(ServerboundProximityFuzePacket.class, id++, ServerboundProximityFuzePacket::new);
+		channel.registerC2SPacket(ServerboundFiringActionPacket.class, id++, ServerboundFiringActionPacket::new);
+		channel.registerC2SPacket(ServerboundCarriageWheelPacket.class, id++, ServerboundCarriageWheelPacket::new);
+		channel.registerC2SPacket(ServerboundSetFireRatePacket.class, id++, ServerboundSetFireRatePacket::new);
 
-		channel.messageBuilder(ServerboundCarriageWheelPacket.class, id++)
-				.encoder(ServerboundCarriageWheelPacket::encode)
-				.decoder(ServerboundCarriageWheelPacket::new)
-				.consumer(ServerboundCarriageWheelPacket::handle)
-				.add();
+		// Register S2C packets
+		channel.registerS2CPacket(ClientboundRecipesPacket.class, id++, ClientboundRecipesPacket::new);
+		channel.registerS2CPacket(ClientboundUpdateContraptionPacket.class, id++, ClientboundUpdateContraptionPacket::new);
+		channel.registerS2CPacket(ClientboundAnimateCannonContraptionPacket.class, id++, ClientboundAnimateCannonContraptionPacket::new);
 
-		channel.messageBuilder(ClientboundAnimateCannonContraptionPacket.class, id++)
-				.encoder(ClientboundAnimateCannonContraptionPacket::encode)
-				.decoder(ClientboundAnimateCannonContraptionPacket::new)
-				.consumer(ClientboundAnimateCannonContraptionPacket::handle)
-				.add();
-
-		channel.messageBuilder(ServerboundSetFireRatePacket.class, id++)
-				.encoder(ServerboundSetFireRatePacket::encode)
-				.decoder(ServerboundSetFireRatePacket::new)
-				.consumer(ServerboundSetFireRatePacket::handle)
-				.add();
-		
 		return channel;
 	}
-	
-	public static void init() {}
-	
+
 }

@@ -1,14 +1,14 @@
 package rbasamoyai.createbigcannons.network;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.AbstractContraptionEntity;
+import me.pepperbell.simplenetworking.S2CPacket;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
-
-public class ClientboundAnimateCannonContraptionPacket {
+public class ClientboundAnimateCannonContraptionPacket implements S2CPacket {
 
 	private final int id;
 
@@ -24,14 +24,15 @@ public class ClientboundAnimateCannonContraptionPacket {
 		buf.writeVarInt(this.id);
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> sup) {
-		NetworkEvent.Context ctx = sup.get();
-		ctx.enqueueWork(() -> {
-			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CBCClientHandlers.animateCannon(this));
-		});
-		ctx.setPacketHandled(true);
+	public int id() {
+		return this.id;
 	}
 
-	public int id() { return this.id; }
+	@Override
+	public void handle(Minecraft client, ClientPacketListener listener, PacketSender responseSender, SimpleChannel channel) {
+		client.execute(() -> {
+			CBCClientHandlers.animateCannon(this);
+		});
+	}
 
 }
