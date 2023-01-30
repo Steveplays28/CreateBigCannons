@@ -158,7 +158,9 @@ public class CannonCarriageEntity extends Entity implements ControlPitchContrapt
 				if (cannon instanceof MountedAutocannonContraption autocannon) {
 					autocannon.getItemOptional().ifPresent(h -> {
 						ItemStack stack = getValidStack(player, CBCItems.AUTOCANNON_CARTRIDGE::isIn);
-						ItemStack result = h.insertItem(1, stack, false);
+						ItemStack result = stack.copy();
+						result.setCount(stack.getCount() + 1);
+
 						if (!player.isCreative() && stack.getCount() != result.getCount()) {
 							stack.setCount(result.getCount());
 							if (stack.isEmpty()) player.getInventory().removeItem(stack);
