@@ -4,22 +4,13 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import rbasamoyai.createbigcannons.base.CBCCommonEvents;
 import rbasamoyai.createbigcannons.base.CBCRegistries;
 import rbasamoyai.createbigcannons.config.CBCConfigs;
 import rbasamoyai.createbigcannons.crafting.BlockRecipeFinder;
@@ -44,12 +35,7 @@ public class CreateBigCannons implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-		IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
-		ModLoadingContext mlContext = ModLoadingContext.get();
-
-		REGISTRATE.registerEventListeners(modEventBus);
-
+		// Registry
 		CBCRegistries.init();
 
 		ModGroup.register();
@@ -59,35 +45,30 @@ public class CreateBigCannons implements ModInitializer {
 		CBCEntityTypes.register();
 		CBCMenuTypes.register();
 		CBCFluids.register();
-		CBCRecipeTypes.register(modEventBus);
-
-		CannonCastShape.CANNON_CAST_SHAPES.register(modEventBus);
+		CBCRecipeTypes.register();
+		CannonCastShape.CANNON_CAST_SHAPES.register();
 		CBCContraptionTypes.prepare();
 		CBCChecks.register();
 		BlockRecipeSerializer.register();
 		BlockRecipeType.register();
-
-		CBCParticleTypes.PARTICLE_TYPES.register(modEventBus);
-
+		CBCParticleTypes.PARTICLE_TYPES.register();
 		CBCTags.register();
 
-		modEventBus.addListener(this::onCommonSetup);
-
+		// Events
+		ServerLifecycleEvents.SERVER_STARTING.register(this::onCommonSetup);
 		addDatapackReloadListeners();
-		forgeEventBus.addListener(this::onDatapackSync);
-		CBCCommonEvents.register(forgeEventBus);
 
-		CBCConfigs.registerConfigs(mlContext);
+		// Config
+		CBCConfigs.registerConfigs();
 
+		// Serializers
 		this.registerSerializers();
 
-		// Should be called after everything has been registered
+		// Registry finalizer, should be called after everything has been registered
 		REGISTRATE.register();
-
-		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateBigCannonsClient.prepareClient(modEventBus, forgeEventBus));
 	}
 
-	private void onCommonSetup(FMLCommonSetupEvent event) {
+	private void onCommonSetup(MinecraftServer minecraftServer) {
 		CBCNetwork.init();
 		FluidBlob.registerDefaultBlobEffects();
 	}
@@ -96,14 +77,14 @@ public class CreateBigCannons implements ModInitializer {
 		ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(BlockRecipeFinder::onDatapackReload);
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(BlockRecipesManager.ReloadListener.INSTANCE);
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(BlockHardnessHandler.ReloadListener.INSTANCE);
+		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(this::onDatapackSync);
 	}
 
-	private void onDatapackSync(OnDatapackSyncEvent event) {
-		ServerPlayer player = event.getPlayer();
-		if (player == null) {
+	private void onDatapackSync(ServerPlayer serverPlayer, boolean b) {
+		if (serverPlayer == null) {
 			BlockRecipesManager.syncToAll();
 		} else {
-			BlockRecipesManager.syncTo(player);
+			BlockRecipesManager.syncTo(serverPlayer);
 		}
 	}
 
