@@ -95,7 +95,7 @@ public abstract class AbstractMountedCannonContraption extends Contraption  {
 
 	public BlockPos getSeatPos(Entity entity) { return null; }
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.Client)
 	@Override public ContraptionLighter<?> makeLighter() { return new NonStationaryLighter<>(this); }
 
 	public static int getMaxCannonLength() {

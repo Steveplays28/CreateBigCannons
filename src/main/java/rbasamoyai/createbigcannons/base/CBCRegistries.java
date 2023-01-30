@@ -19,7 +19,7 @@ public class CBCRegistries {
 			REGISTRATE.makeRegistry("block_recipe_serializers", BlockRecipeSerializer.class, CBCRegistries::makeRegBlockRecipeSerializer);
 
 	public static final Supplier<IForgeRegistry<BlockRecipeType<?>>> BLOCK_RECIPE_TYPES =
-			REGISTRATE.makeRegistry("block_recipe_types", BlockRecipeType.class, CBCRegistries::makeRegBlockRecipeType);
+			REGISTRATE.block("block_recipe_types", BlockRecipeType.class, CBCRegistries::makeRegBlockRecipeType);
 
 	public static final Supplier<IForgeRegistry<CannonCastShape>> CANNON_CAST_SHAPES =
 			REGISTRATE.makeRegistry("cannon_cast_shapes", CannonCastShape.class, CBCRegistries::makeRegCannonCastShape);

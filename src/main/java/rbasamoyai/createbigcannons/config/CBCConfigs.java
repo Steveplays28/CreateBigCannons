@@ -46,7 +46,7 @@ public class CBCConfigs {
 		return config;
 	}
 	
-	public static void registerConfigs(ModLoadingContext context) {
+	public static void registerConfigs() {
 		CLIENT = register(CBCCfgClient::new, ModConfig.Type.CLIENT);
 		COMMON = register(CBCCfgCommon::new, ModConfig.Type.COMMON);
 		SERVER = register(CBCCfgServer::new, ModConfig.Type.SERVER);

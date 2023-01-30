@@ -3,14 +3,18 @@ package rbasamoyai.createbigcannons.crafting;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.pepperbell.simplenetworking.S2CPacket;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import rbasamoyai.createbigcannons.base.CBCRegistries;
 import rbasamoyai.createbigcannons.network.CBCNetwork;
@@ -18,12 +22,11 @@ import rbasamoyai.createbigcannons.network.CBCNetwork;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class BlockRecipesManager {
 
 	public static final String resourceLocationString = "block_recipes";
-	public static final ResourceLocation resourceLocation = ResourceLocation.tryParse(ResourceLocationString);
+	public static final ResourceLocation resourceLocation = ResourceLocation.tryParse(resourceLocationString);
 
 	private static final Map<ResourceLocation, BlockRecipe> BLOCK_RECIPES_BY_NAME = new HashMap<>();
 	private static final Map<BlockRecipeType<?>, Map<ResourceLocation, BlockRecipe>> BLOCK_RECIPES_BY_TYPE = new HashMap<>();
@@ -112,7 +115,8 @@ public class BlockRecipesManager {
 		}
 	}
 
-	public static class ClientboundRecipesPacket {
+	public static class ClientboundRecipesPacket implements S2CPacket {
+
 		private FriendlyByteBuf buf;
 
 		public ClientboundRecipesPacket() {
@@ -126,13 +130,11 @@ public class BlockRecipesManager {
 			writeBuf(buf);
 		}
 
-		public void handle(Supplier<NetworkEvent.Context> sup) {
-			NetworkEvent.Context ctx = sup.get();
-			ctx.enqueueWork(() -> {
-				readBuf(this.buf);
-			});
-			ctx.setPacketHandled(true);
+		@Override
+		public void handle(Minecraft client, ClientPacketListener listener, PacketSender responseSender, SimpleChannel channel) {
+			client.execute(() -> readBuf(this.buf));
 		}
+
 	}
 
 }

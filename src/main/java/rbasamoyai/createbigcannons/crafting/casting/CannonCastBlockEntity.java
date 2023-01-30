@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
+import com.simibubi.create.content.contraptions.components.actors.PortableFluidInterfaceTileEntity;
 import com.simibubi.create.foundation.fluid.SmartFluidTank;
 import com.simibubi.create.foundation.tileEntity.IMultiTileContainer;
 import com.simibubi.create.foundation.tileEntity.SmartTileEntity;
@@ -14,6 +15,10 @@ import com.simibubi.create.foundation.tileEntity.TileEntityBehaviour;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat.Chaser;
 
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -52,7 +57,7 @@ public class CannonCastBlockEntity extends SmartTileEntity implements WandAction
 	private static final Object CASTING_RECIPES_KEY = new Object();
 	
 	protected FluidTank fluid;
-	protected LazyOptional<IFluidHandler> fluidOptional = null;
+	protected LazyOptional<FluidTank> fluidOptional = null;
 	protected List<CannonCastShape> structure = new ArrayList<>();
 	protected CannonCastShape castShape = null;
 	protected BlockPos controllerPos;
