@@ -69,7 +69,6 @@ public class CreateBigCannons implements ModInitializer {
 	}
 
 	private void onCommonSetup(MinecraftServer minecraftServer) {
-		CBCNetwork.init();
 		FluidBlob.registerDefaultBlobEffects();
 	}
 
