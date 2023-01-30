@@ -22,6 +22,12 @@ repositories {
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
     maven { url = "https://jitpack.io/" } // Mixin Extras, Fabric ASM
     maven { url = "https://maven.tterrag.com/" } // Flywheel
+
+    // Cardinal Components API
+    maven {
+        name = 'Ladysnake Mods'
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
+    }
 }
 
 dependencies {
@@ -48,6 +54,9 @@ dependencies {
 
     // Porting Lib
     modImplementation(include("io.github.fabricators_of_create:Porting-Lib:${project.porting_lib_version}"))
+
+    // Cardinal Components API
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-api:${project.cardinal_components_api_version}"))
 
     // Development QOL
     modLocalRuntime("maven.modrinth:lazydfu:${project.lazydfu_version}")
